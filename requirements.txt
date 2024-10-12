@@ -1,0 +1,11 @@
+pandas
+numpy
+emoji
+tensorflow
+pickle
+keras
+requests
+tensorflow
+shiny
+sklearn 
+zipfile
