@@ -1,11 +1,11 @@
 pandas
 numpy
-emoji
-tensorflow
+emoji==1.7
+tensorflow==2.16.1
 pickle
-keras
+keras==3.3.3
 requests
 tensorflow
 shiny
 sklearn 
-zipfile
+lxml
