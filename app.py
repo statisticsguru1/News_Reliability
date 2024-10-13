@@ -12,8 +12,8 @@ import json
 from tensorflow.keras.layers import TextVectorization
 import lime
 import lime.lime_text
-
-
+import matplotlib.colors as mcolors
+ 
 # vectorizer
    
 # Load the vocabulary
@@ -71,6 +71,24 @@ def predict_prob(texts):
     predictions = model.predict(sequences)
     return predictions
 
+base_orange = (1, 0.65, 0)  # Lighter orange for positive contributions
+base_blue = (0.27, 0.51, 0.71)  # Lighter blue for negative contributions
+base_white = (1, 1, 1)  # White for zero contribution
+
+def contribution_to_background_color(word, contribution, max_contribution=1):
+    norm_contribution = contribution / max_contribution
+    norm_contribution = max(min(norm_contribution, 1), -1)
+    if norm_contribution > 0:
+        darkened_color = [base_white[i] * (1 - norm_contribution) + base_orange[i] * norm_contribution for i in range(3)]
+    elif norm_contribution < 0:
+        darkened_color = [base_white[i] * (1 + norm_contribution) + base_blue[i] * -norm_contribution for i in range(3)]
+    else:
+        darkened_color = base_white
+    return f'<span style="background-color:{mcolors.to_hex(darkened_color)}; padding:2px;">{word}</span>'
+
+
+
+
 AUTOTUNE = tf.data.AUTOTUNE 
 
 app_ui = ui.page_fluid(
@@ -91,6 +109,7 @@ app_ui = ui.page_fluid(
         padding: 20px;
         margin-top: 20px;
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        width: 100%;
     }
     .card-header {
         font-weight: bold;
@@ -111,6 +130,11 @@ app_ui = ui.page_fluid(
     #Go:hover {
         background-color: #3A50B3;
     }
+    span {
+    display: inline-block;
+    white-space: normal; /* Allows wrapping within spans */
+}
+
     """
     ),
     ui.h3("Fake News Detection App"),
@@ -124,9 +148,12 @@ app_ui = ui.page_fluid(
         ui.column(4, ui.input_action_button(id="Go", label="Search", width="200px",align="center")),
     ui.column(4,)
     ),
-    ui.output_ui("txt_title"),
+    ui.tags.br(),
+    ui.tags.br(),
+    #ui.output_ui("txt_title"),
     ui.row(
-        ui.column(12, 
+        ui.column(1,),
+        ui.column(10, 
             ui.tags.div(
                 ui.tags.div("Prediction Results", class_="card-header"),
                 ui.tags.div(ui.output_text("txt_length"), class_="card-body"),
@@ -136,15 +163,19 @@ app_ui = ui.page_fluid(
                 ui.tags.div(ui.output_text("txt4"), class_="card-body"),
                 class_="card"
             ),
-        )),
+        ),
+        ui.column(1,) 
+        ),
         ui.row(
-        ui.column(12, 
+            ui.column(1,) ,
+        ui.column(10, 
             ui.tags.div(
                 ui.tags.div("LIME Explanation", class_="card-header"),
-                ui.output_text("lime_output"), # For displaying LIME explanations
+                ui.output_ui("lime_output"), # For displaying LIME explanations
                 class_="card"
             )
-        )
+        ),
+        ui.column(1,) 
     )
 )
 
@@ -252,23 +283,33 @@ def server(input, output, session):
     @reactive.event(input.Go)
     def lime_explanation():
         # Prepare the input
-        text = input.article()
         textdata = text_preps()
         x_sample = next(iter(textdata))
         
         # Decode the sample text
-        decoded_text = decode_text(x_sample[0].numpy())
-        
+        decoded_text = decode_text(x_sample[0])
         # LIME explanation
         explainer = lime.lime_text.LimeTextExplainer(class_names=['Fake', 'Real'])
-        explanation = explainer.explain_instance(decoded_text, predict_prob, num_features=10)
-        return explanation.as_html()
+        explanation = explainer.explain_instance(decoded_text, predict_prob, num_features=100)
+        text_explanation=explanation.as_list()
+        max_contribution = max(abs(c) for _, c in text_explanation)
+        colored_text = []
+        
+        for word in input.article().split():
+            for explained_word, contribution in text_explanation:
+                if word in explained_word:
+                    colored_text.append(contribution_to_background_color(word, contribution, max_contribution))
+                    break
+            else:
+                colored_text.append(f'<span style="white-space:nowrap">{word}</span>')
+        colored_text_html = " ".join(colored_text)
+        return colored_text_html
+
     
     @output
     @render.ui
     def lime_output():
-        lime_html = lime_explanation()
-        return ui.HTML(lime_html)
+        return ui.HTML(f'<div style="display: inline-block; white-space: normal;">{lime_explanation()}</div>')
 
 
 app = App(app_ui, server)
