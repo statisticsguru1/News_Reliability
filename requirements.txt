@@ -9,3 +9,4 @@ tensorflow
 shiny
 sklearn 
 lxml
+lime
