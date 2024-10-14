@@ -13,7 +13,10 @@ from tensorflow.keras.layers import TextVectorization
 import lime
 import lime.lime_text
 import matplotlib.colors as mcolors
- 
+from pathlib import Path
+import matplotlib.pyplot as plt
+from icons import gear_fill,info_circle_fill
+
 # vectorizer
    
 # Load the vocabulary
@@ -87,101 +90,104 @@ def contribution_to_background_color(word, contribution, max_contribution=1):
     return f'<span style="background-color:{mcolors.to_hex(darkened_color)}; padding:2px;">{word}</span>'
 
 
-
-
 AUTOTUNE = tf.data.AUTOTUNE 
 
+ 
+# Define the UI
 app_ui = ui.page_fluid(
-    ui.tags.style(
-    """
-    body {
-        background-color: #F5F5F5;
-        font-family: 'Arial', sans-serif;
-        color: #333;
-    }
-    h3, h4 {
-        color: #2F408D;
-        text-align: center;
-    }
-    .card {
-        background-color: #fff;
-        border-radius: 10px;
-        padding: 20px;
-        margin-top: 20px;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        width: 100%;
-    }
-    .card-header {
-        font-weight: bold;
-        font-size: 18px;
-        margin-bottom: 15px;
-    }
-    .card-body {
-        font-size: 16px;
-    }
-    #Go {
-        background-color: #2F408D;
-        color: white;
-        border: none;
-        border-radius: 5px;
-        padding: 10px 20px;
-        transition: background-color 0.3s ease;
-    }
-    #Go:hover {
-        background-color: #3A50B3;
-    }
-    span {
-    display: inline-block;
-    white-space: normal; /* Allows wrapping within spans */
-}
+    ui.tags.div("Fake news prediction app",class_='title-bar'),
+    ui.layout_sidebar(
+        ui.sidebar(
+            ui.input_numeric(id="num_features",label="Number of feature",value=100,min=0,max=None),
+            ui.input_numeric(id='num_samples',label="number of samples",value =5000,min=0,max=None),
+            ui.input_action_button(id="Go", label="Check", width="200px",align="center")
+        ),
 
-    """
-    ),
-    ui.h3("Fake News Detection App"),
-    ui.row(
-        ui.column(2,),
-        ui.column(8, ui.input_text_area(id="article", label="", placeholder="Enter article", height='200px', width='1000px')),
-    ui.column(2,)
-    ),
-     ui.row(
-         ui.column(4,),
-        ui.column(4, ui.input_action_button(id="Go", label="Search", width="200px",align="center")),
-    ui.column(4,)
-    ),
-    ui.tags.br(),
-    ui.tags.br(),
-    #ui.output_ui("txt_title"),
-    ui.row(
-        ui.column(1,),
-        ui.column(10, 
-            ui.tags.div(
-                ui.tags.div("Prediction Results", class_="card-header"),
-                ui.tags.div(ui.output_text("txt_length"), class_="card-body"),
-                ui.tags.div(ui.output_text("txt1"), class_="card-body"),
-                ui.tags.div(ui.output_text("txt2"), class_="card-body"),
-                ui.tags.div(ui.output_text("txt3"), class_="card-body"),
-                ui.tags.div(ui.output_text("txt4"), class_="card-body"),
-                class_="card"
+        ui.card(
+        ui.card_header(
+            "Enter Article",
+            ui.popover(
+                ui.span(
+                    info_circle_fill,
+                    style="position:absolute; top: 5px; right: 7px;",
+                ),
+                ui.div(
+                    ui.tags.p("This application predicts whether a news article is fake or real based on user input."),
+                    ui.tags.p("You can enter the article text and adjust the parameters to see how the predictions change."),
+                    ui.tags.p("Use the 'Check' button to get predictions."),
+                    ui.tags.p("The models used here were trained with articles longer than 200 characters, so this app works better for such cases."),
+                    class_="custom-popover"),
+                placement="right",
+                id="card_popover",
+                
             ),
         ),
-        ui.column(1,) 
+        ui.input_text_area(id="article", label="", placeholder="🚀 NASA's #PsycheMission launched on October 13, 2023, to explore asteroid 16 Psyche, believed to be the exposed core of a planetesimal! 🪐 The mission aims to unlock secrets of planetary formation. Psyche is mostly metal and could offer clues about Earth’s core. Stay tuned as the spacecraft journeys over 2 billion miles to reach it by 2029! #SpaceExploration #NASA #Asteroid", height='200px', width='1200px')
+    ),    
+        ui.layout_columns(
+            ui.card(
+                ui.card_header("Prediction Results"),
+                ui.card_body(
+                   ui.layout_column_wrap(
+                    ui.card(
+                        ui.card_body(
+                        ui.output_ui("txt_length"),
+                        #ui.output_ui("txt1"),
+                        ui.output_ui("txt2"),
+                        ui.output_ui("txt3"),
+                        ui.output_ui("txt4")),
+                        fill=True
+                    ),
+                     ui.card(
+                        ui.card_body(
+                            ui.output_plot("bar_fake")
+                        ),
+                        fill=True
+                        ),
+                        heights_equal="row",
+                        width=1),
+                fill=True,
+            )),
+            ui.card(
+                ui.card_header("LIME Explanation"),
+
+                ui.card_body(
+                    ui.output_ui("lime_output")
+                ),
+                fill=True
+            ),
+            col_widths=[4, 8],
+            fill=False
+        )
         ),
-        ui.row(
-            ui.column(1,) ,
-        ui.column(10, 
-            ui.tags.div(
-                ui.tags.div("LIME Explanation", class_="card-header"),
-                ui.output_ui("lime_output"), # For displaying LIME explanations
-                class_="card"
-            )
+        ui.tags.div(
+        ui.tags.p("© 2024 Fesnic Research Solutions. All rights reserved."),
+        ui.tags.div(
+            ui.tags.a(
+                ui.tags.img(src="https://raw.githubusercontent.com/statisticsguru1/Utility-functions/refs/heads/main/E-learn/images/facebook.svg", alt="Facebook"),
+                href="https://www.facebook.com/FesnicResearchSolutions/", target="_blank"
+            ),
+            ui.tags.a(
+                ui.tags.img(src= "https://raw.githubusercontent.com/statisticsguru1/Utility-functions/refs/heads/main/E-learn/images/instagram.svg", alt="Instagram"),
+                href="https://www.instagram.com/fesnicresearchsolutions/?hl=en", target="_blank"
+            ),
+            ui.tags.a(
+                ui.tags.img(src="https://raw.githubusercontent.com/statisticsguru1/Utility-functions/refs/heads/main/E-learn/images/linkedin.svg", alt="LinkedIn"),
+                href="https://www.linkedin.com/in/festus-nzuma-26580163", target="_blank"
+            ),
+            ui.tags.a(
+                ui.tags.img(src="https://raw.githubusercontent.com/statisticsguru1/Utility-functions/refs/heads/main/E-learn/images/youtube.svg", alt="YouTube"),
+                href="https://www.youtube.com/@FesnicResearchSolutions", target="_blank"
+            ),
+            class_="social-media"
         ),
-        ui.column(1,) 
-    )
+        class_='custom-foot'
+    ),
+    ui.include_css(Path(__file__).parent / "styles.css")
 )
 
 
-
-
+# Define the server logic
 def server(input, output, session):
     @output
     @render.ui
@@ -190,12 +196,12 @@ def server(input, output, session):
         return ui.tags.h4("Results") 
       
     @output
-    @render.text
+    @render.ui
     @reactive.event(input.Go)
     def txt_length():
         xx = str(input.article())
         xx=len(xx.split())
-        return f"Article length: {xx} words"
+        return ui.HTML(f"<strong>Article length: {xx} words</strong>")
 
     
     @reactive.Calc
@@ -233,14 +239,29 @@ def server(input, output, session):
         return naive
     
     @output
-    @render.text
+    @render.ui
     def txt1():
         modelprediction=Ann_pred()
         xs=round(100*modelprediction[0],4)
-        return f"Probability it is fake(based on ANN) : {round(xs,2)}%"
+        return ui.HTML(f"<strong>Prob it is fake fake(based on ANN) :{round(xs,2)}%</strong>")
+    # Create the progress bar for "Fake"
+    @output
+    @render.plot   
+    def bar_fake():
+        plt.figure(figsize=(3, 3))
+        categories = ['Fake', 'Real']
+        values = [round(Ann_pred()[0], 4), round(Ann_pred()[1], 4)]
+        colors = ['#145da0', '#FF8C00']
+        plt.bar(categories, values, color=colors)
+        for index, value in enumerate(values):
+            plt.text(index, value, str(value), ha='center', va='bottom', fontsize=12)
+            plt.title("Probabilities")
+            plt.tight_layout()
+            plt.show()
+
 
     @output
-    @render.text
+    @render.ui
     def txt2():
         modelprediction=Ann_pred()
         modelprediction1=round(modelprediction[0])
@@ -249,10 +270,10 @@ def server(input, output, session):
         else:
             x="Fake"
         xx=x
-        return f"ANN prediction: {xx}"
+        return ui.HTML(f"<strong>ANN prediction: {xx}</strong>")
 
     @output
-    @render.text
+    @render.ui
     def txt3():
         kmeans_pred = Kmean_pred()
         if kmeans_pred==0:
@@ -260,10 +281,10 @@ def server(input, output, session):
         else:
             x="Fake"
         xx=x
-        return f"Kmeans prediction: {xx}"
+        return ui.HTML(f"<strong>Kmeans prediction: {xx}</strong>")
 
     @output
-    @render.text
+    @render.ui
     def txt4():
         kmeans_pred = Kmean_pred()
         modelprediction=Ann_pred()
@@ -276,7 +297,7 @@ def server(input, output, session):
         else:
             x="Fake"
         xx=x
-        return f"weighted prediction: {xx}"
+        return ui.HTML(f"<strong>weighted prediction: {xx}</strong>")
     
    # LIME Explanation logic
     @reactive.Calc
@@ -285,12 +306,11 @@ def server(input, output, session):
         # Prepare the input
         textdata = text_preps()
         x_sample = next(iter(textdata))
-        
         # Decode the sample text
         decoded_text = decode_text(x_sample[0])
         # LIME explanation
         explainer = lime.lime_text.LimeTextExplainer(class_names=['Fake', 'Real'])
-        explanation = explainer.explain_instance(decoded_text, predict_prob, num_features=100)
+        explanation = explainer.explain_instance(decoded_text, predict_prob, num_features=input.num_features(),num_samples=input.num_samples())
         text_explanation=explanation.as_list()
         max_contribution = max(abs(c) for _, c in text_explanation)
         colored_text = []

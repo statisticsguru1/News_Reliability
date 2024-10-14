@@ -1,0 +1,134 @@
+body {
+    background-color: #F5F5F5;
+    font-family: 'Arial', sans-serif;
+    color: #333;
+}
+h3, h4 {
+    color: #2F408D;
+    text-align: center;
+}
+.card {
+    background-color: #fff;
+}
+.card-header {
+    font-weight: bold;
+    font-size: 18px;
+    margin-bottom: 15px;
+    background-color:#2F408D;
+    color: white;
+}
+.card-body {
+    font-size: 16px;
+}
+#Go {
+    background-color: #2F408D;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 10px 20px;
+    transition: background-color 0.3s ease;
+}
+#Go:hover {
+    background-color: #3A50B3;
+}
+span {
+display: inline-block;
+white-space: normal; /* Allows wrapping within spans */
+}
+
+.title-bar {
+    background-color: #2F408D;
+    color: white;
+    padding: 20px;
+    text-align: left;
+    font-family: 'Arial', sans-serif;
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 5px;
+    border-top-left-radius: 15px; /* Adjust the radius value as needed */
+    border-top-right-radius: 15px; /* Adjust the radius value as needed */
+}
+
+
+.custom-card-header {
+    background-color: #e7f1ff; /* Background color */
+    display: flex;                   /* Use flexbox for alignment */
+    align-items: center;            /* Center items vertically */
+    color: black;                   /* Text color */
+    font-family: 'Arial', sans-serif; /* Font style */
+    font-size: 18px;                /* Font size */
+    font-weight: bold;              /* Font weight */
+    padding: 10px;                  /* Padding around the text */
+    border-radius: 5px;             /* Rounded corners */
+}
+
+.info-icon {
+    background-color: #007bff; /* Icon background color */
+    color: white; /* Icon color */
+    width: 24px; /* Icon width */
+    height: 24px; /* Icon height */
+    border-radius: 50%; /* Round icon */
+    position: absolute; /* Position icon in the corner */
+    top: 15px; /* Position from the top */
+    left:5px; /* Position from the left */
+    display: flex; /* Center icon */
+    align-items: center; /* Center icon vertically */
+    justify-content: center; /* Center icon horizontally */
+    font-size: 14px; /* Icon font size */
+}
+
+.custom-card {
+    background-color: transparent;  /* Remove background color */
+}
+.custom-accordion {
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    background-color: #f9f9f9;
+}
+.custom-accordion .accordion-body {
+    padding: 10px;
+    background-color: white;
+    z-index: 10; /* Ensure it layers properly */
+    position: relative;  /* Create new stacking context */
+    overflow: visible;  /* Ensure content is not cut off */
+}
+
+.custom-popover {
+        color: #333;
+        background-color: #f9f9f9;
+        border: 1px solid #ddd;
+        padding: 15px;
+        font-family: Arial, sans-serif;
+        font-size: 14px;
+        line-height: 1.5;
+        border-radius: 5px;
+    }    
+
+    .custom-foot {
+        background-color: #2F408D;
+        color: white;
+        padding: 20px;
+        text-align: center;
+        font-family: 'Arial', sans-serif;
+        font-size: 18px;
+        font-weight: bold;
+        margin-bottom: 5px;
+        border-bottom-left-radius: 15px; /* Adjust the radius value as needed */
+        border-bottom-right-radius: 15px; /* Adjust the radius value as needed */
+    }
+
+    .social-media {
+        display: flex;
+        justify-content: center; /* Align icons in the center */
+        gap: 20px; /* Add space between icons */
+        margin-top: 10px;
+    }
+    .social-media img {
+        width: 30px;
+        height: auto; /* Maintain aspect ratio */
+    }
+
+
+
+    
