@@ -95,7 +95,7 @@ AUTOTUNE = tf.data.AUTOTUNE
  
 # Define the UI
 app_ui = ui.page_fluid(
-    ui.tags.div("Fake news prediction app",class_='title-bar'),
+    ui.tags.div("News Authentication app",class_='title-bar'),
     ui.layout_sidebar(
         ui.sidebar(
             ui.input_numeric(id="num_features",label="Number of feature",value=100,min=0,max=None),
