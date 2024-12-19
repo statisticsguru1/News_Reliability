@@ -7,6 +7,6 @@ keras==3.3.3
 requests
 tensorflow
 shiny
-sklearn 
+scikit-learn 
 lxml
 lime
