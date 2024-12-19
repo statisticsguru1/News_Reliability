@@ -2,7 +2,6 @@ pandas
 numpy
 emoji==1.7
 tensorflow==2.16.1
-pickle
 keras==3.3.3
 requests
 tensorflow
