@@ -1,3 +1,4 @@
+
 # 📢 Hybrid Fake News Detection System
 
 ---
@@ -62,10 +63,14 @@ The model is deployed using **Shiny for Python**, allowing users to:
    - **Probabilities**: Confidence levels 📈.
    - **LIME Explanation**: Highlights the words contributing to the prediction 🔦.
 
+### ⚠️ Note
+- Predictions for **long articles** may take more time.
+- The model was trained on articles approximately **200 words long**, so similar lengths are recommended for optimal performance.
+
 ---
 
-## 🌐 Live Application
-The app is live and accessible here: [Hybrid Fake News Detection System](https://0193ddeb-22a2-5e2b-3079-04bec298aed5.share.connect.posit.cloud/)
+## 🌐 Live App
+The app is live and can be accessed here: [Hybrid Fake News Detection App](https://0193ddeb-22a2-5e2b-3079-04bec298aed5.share.connect.posit.cloud/).
 
 ---
 
